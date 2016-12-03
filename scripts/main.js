@@ -29,10 +29,12 @@ function drawBack() {
     }
 }
 
+var mouseX,mouseY;
+
 function handleMouseMove(e){
 
-    var mouseX=parseInt(e.clientX-offX);
-    var mouseY=parseInt(e.clientY-offY);
+    mouseX=parseInt(e.clientX-offX);
+    mouseY=parseInt(e.clientY-offY);
 
     // Put your mousemove stuff here
     return getPixelColor(mouseX,mouseY);
@@ -45,15 +47,19 @@ function getPixelColor(x, y) {
 }
 
 var ballr = 10;
-var ballv = 0.5;
-var balla = 0.005;
+var ballv = 0.07;
+var balla = 0.007;
 
 var balls = [];
 
 function makeBalls(number) {
-    for (var n = 0; n < number+1; n++) {
-        balls[n] = new Circle(canvasWidth/(number+1)*n+ballr,0,ballr, ballv);
+    
+    for (var n = 0; n < number; n++) {
+        
+        balls[n] = new Circle(canvasWidth/(number)*n+ballr,0,ballr, ballv);
+        
     }
+    
 }
 makeBalls(5);
 
@@ -65,7 +71,11 @@ function update() {
     clearCanvas();
     drawBack();
     
+    ctx.font = "30px Arial";
+    ctx.fillText(count,10,50);
+    
     for (var n = 0; n < balls.length; n++){
+        
         balls[n].fill(ctx);
     	
     	balls[n].y += balls[n].v;
@@ -78,19 +88,18 @@ function update() {
     		balls[n].v *= -1;
     		
     	}
+    	
 	}
+	
 }
 
-
+var count = 0;
 
 canvas.addEventListener('click',function(e){
 
     
     if (handleMouseMove(e) === "(0,0,0)") {
-        
-        balls[0].v = -1
-        
-        alert(mouseX, canvasWidth)
+        count += 1
         
         if(mouseX < canvasWidth/5-ballr) {
             balls[0].v = -1;
@@ -100,9 +109,10 @@ canvas.addEventListener('click',function(e){
             balls[2].v = -1;
         } else if (mouseX < canvasWidth*4/5-ballr){
             balls[3].v = -1;
-        } else if (mouseX < canvasWidth-ballr){
+        } else {
             balls[4].v = -1;
         }
+        
     }
     
 });
