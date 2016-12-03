@@ -5,15 +5,17 @@ var canvasHeight = canvas.height;
 var canvasWidth = canvas.width;
 var ZoneHeight = canvasHeight/5;
 
-var canvasOffset=$("#canvas").offset();
-//var offsetX = canvasOffset.left;
-//var offsetY = canvasOffset.top;
+var offX = canvas.offsetLeft;
+var offY = canvas.offsetTop;
+
 function drawBack() {
-    var slowBy2 = new Zone(ZoneHeight,2),
+    var slowBy0 = new Zone(0,2),
+        slowBy2 = new Zone(ZoneHeight,2),
         slowBy4 = new Zone(ZoneHeight*2,4),
         slowBy8 = new Zone(ZoneHeight*3,8),
         slowBy16 = new Zone(ZoneHeight*4,16);
     
+    slowBy0.fill(canvas,ctx, "orange");
     slowBy2.fill(canvas, ctx,"red");
     slowBy4.fill(canvas, ctx, "yellow");
     slowBy8.fill(canvas, ctx, "green");
@@ -27,46 +29,30 @@ function drawBack() {
     }
 }
 
-
-var eyedropperIsActive=false; 
-
-$("#startDropper").mousedown(function(e){
-    eyedropperIsActive=true;
-    handleMouseMove(e);
-    
-});
-
-$("#endDropper").mouseup(function(e) {eyedropperIsActive=false;})
-
 function handleMouseMove(e){
 
-    if(!eyedropperIsActive){return;}
-    
-    var mouseX=parseInt(e.clientX-offsetX);
-    var mouseY=parseInt(e.clientY-offsetY);
+    var mouseX=parseInt(e.clientX-offX);
+    var mouseY=parseInt(e.clientY-offY);
 
     // Put your mousemove stuff here
-    var eyedropColor=getPixelColor(mouseX,mouseY);
-    $("#results").css("backgroundColor",getPixelColor(mouseX,mouseY));
+    return getPixelColor(mouseX,mouseY);
 
 }
 
 function getPixelColor(x, y) {
-    var pxData = ctx.getImageData(x,y,1,1);
-    return("rgb("+pxData.data[0]+","+pxData.data[1]+","+pxData.data[2]+")");
+    var pxData = ctx.getImageData(x, y, 1, 1);
+    return ("(" + pxData.data[0] + "," + pxData.data[1] + "," + pxData.data[2] + ")");
 }
 
-
-
 var ballr = 10;
-var ballv = 1;
+var ballv = 0.5;
 var balla = 0.005;
 
 var balls = [];
 
 function makeBalls(number) {
-    for (var n = 0; n < number; n++) {
-        balls[n] = new Circle(canvasWidth/(number+1)*n,n*2,ballr);
+    for (var n = 0; n < number+1; n++) {
+        balls[n] = new Circle(canvasWidth/(number+1)*n+ballr,0,ballr, ballv);
     }
 }
 makeBalls(5);
@@ -80,23 +66,45 @@ function update() {
     drawBack();
     
     for (var n = 0; n < balls.length; n++){
-        balls[n].fill(ctx,0,ballv);
-    
-    
-    	balls[n].fill(ctx,0,ballv);
+        balls[n].fill(ctx);
     	
-    	// Now, lets make the ball move by adding the velocity vectors to its position
-    	balls[n].y += ballv;
-    	// Ohh! The ball is moving!
-    	// Lets add some acceleration
-    	ballv += balla;
-    	//Perfect! Now, lets make it rebound when it touches the floor
+    	balls[n].y += balls[n].v;
+    	
+    	balls[n].v += balla;
+    	
     	if(balls[n].y + balls[n].r > canvasHeight) {
-    		// First, reposition the ball on top of the floor and then bounce it!
+    	    
     		balls[n].y = canvasHeight - balls[n].radius;
-    		ballv *= -1;
-    		// The bounceFactor variable that we created decides the elasticity or how elastic the collision will be. If it's 1, then the collision will be perfectly elastic. If 0, then it will be inelastic.
+    		balls[n].v *= -1;
+    		
     	}
 	}
 }
+
+
+
+canvas.addEventListener('click',function(e){
+
+    
+    if (handleMouseMove(e) === "(0,0,0)") {
+        
+        balls[0].v = -1
+        
+        alert(mouseX, canvasWidth)
+        
+        if(mouseX < canvasWidth/5-ballr) {
+            balls[0].v = -1;
+        } else if (mouseX < canvasWidth*2/5-ballr){
+            balls[1].v = -1;
+        } else if (mouseX < canvasWidth*3/5-ballr){
+            balls[2].v = -1;
+        } else if (mouseX < canvasWidth*4/5-ballr){
+            balls[3].v = -1;
+        } else if (mouseX < canvasWidth-ballr){
+            balls[4].v = -1;
+        }
+    }
+    
+});
+
 setInterval(update,1000/60);

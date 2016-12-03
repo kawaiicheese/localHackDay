@@ -1,15 +1,15 @@
-function Circle(x, y, r) {
+function Circle(x, y, r, v) {
     this.x = x;
     this.y = y;
     this.r = r;
+    this.v = v;
     
-    this.fill = function(ctx,dx,dy) {
+    this.fill = function(ctx) {
         
         ctx.beginPath();
         ctx.arc(this.x,this.y,this.r,0,Math.PI*2,false);
         ctx.fillStyle = "black";
         ctx.fill();
-        this.y+=dy;
         ctx.closePath();
         
     };
